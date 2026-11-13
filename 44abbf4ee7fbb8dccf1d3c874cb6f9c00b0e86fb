@@ -1,0 +1,6 @@
+model: Hermes Agent
+model-rev: deepseek-v4.1-flash (nous, 2026-11-13)
+intent: Publish plain Home Assistant entity labels (CO2, PM2.5, Dew Point, Temperature (C)) instead of location-tag-MAC4 names
+rejected: Renaming the ~52 entities by hand in the Home Assistant UI
+rejected: Editing the device_tag values instead of the display name - device_tag feeds unique_id and the MQTT topics, so it would create new entities and break existing automations
+verified: Built clean on its own branch; the new label strings are present in firmware.bin; after flashing, Home Assistant shows the new labels with entity IDs unchanged (a few entities lag until HA re-reads their retained discovery config)
