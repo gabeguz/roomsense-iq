@@ -1,0 +1,6 @@
+model: Hermes Agent
+model-rev: deepseek-v4.1-flash (nous, 2026-11-13)
+intent: Make the web UI Access Point switch actually disable the SoftAP on RoomSense IQ sensors
+rejected: Leaving the SoftAP on permanently and telling owners to live with the interference - the vendor's own position, and the trigger for the Denon Home 150 reboot loop
+rejected: Honouring the switch with no rescue path - a wrong WiFi password or a moved network would leave the sensor unreachable until reflashed
+verified: Built with ESP-IDF v4.4.8 (esp32s3); flashed on hardware: switching the AP off removed RoomSense-Foyer-0580 from fresh wifi scans and AP_STATE=false survived reboots; power-cycling the access point left the sensor reconnecting by itself in 66s; rebooting the sensor next to a running Denon Home 150 produced no Denon ICMP or HEOS port 1255 dropout over a 25 minute watch
