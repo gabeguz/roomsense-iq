@@ -1,0 +1,6 @@
+model: Hermes Agent
+model-rev: deepseek-v4.1-flash (nous, 2026-11-13)
+intent: Give every RoomSense IQ unit its own Home Assistant device instead of one merged device for the whole house
+rejected: Leaving one merged device and splitting entities with Home Assistant UI helpers - 20 minutes of manual work per unit and it does not survive a re-add
+rejected: Keying the device identity on the location tag rather than the MAC address - the tag is empty until the user sets it and is not guaranteed unique
+verified: Built clean; after flashing, Home Assistant shows a per-unit device (RoomSense IQ Foyer (806599A50580)) with entity IDs unchanged, so existing automations and dashboards kept working
