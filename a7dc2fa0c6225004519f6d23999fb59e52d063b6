@@ -1,0 +1,7 @@
+model: Hermes Agent
+model-rev: deepseek-v4.1-flash (nous, 2026-11-13)
+intent: Make the web UI's Access Point switch actually take the SoftAP down, and stop Home Assistant folding every sensor in the house into one device
+rejected: Leaving the SoftAP on permanently and telling owners to live with the interference - the vendor's own stance, and the cause of the Denon Home 150 reboot loop
+rejected: Honouring the switch with no rescue path - a wrong WiFi password or a moved network would leave the sensor unreachable until reflashed
+rejected: Fixing the Home Assistant device grouping by renaming entities in the HA UI - 52 manual renames that firmware updates would not preserve for future units
+verified: Built with ESP-IDF v4.4.8 (esp32s3) and flashed on hardware: switch off removed the SoftAP from a fresh wifi scan and AP_STATE=false survived two reboots; access point power-cycled, sensor self-recovered in 66s with no intervention; sensor power-cycled next to the Denon Home 150 with the AP off, Denon showed no ICMP or HEOS port 1255 dropout
