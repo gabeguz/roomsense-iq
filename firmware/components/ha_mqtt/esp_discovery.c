@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "cJSON.h"
 #include "esp_discovery.h"
@@ -61,6 +62,36 @@ esp_err_t esp_discovery_ensure_number(esp_discovery_number_t *discovery)
 	return ESP_OK;
 }
 
+// Every entity a unit publishes carries this device identity. A constant "RoomSense"
+// identifier/name made Home Assistant fold the entities of every sensor in the house into
+// a single device, which then has to be split up by hand, so key it on the MAC address.
+static char esp_discovery_device_identifier[64] = {0};
+static char esp_discovery_device_name[96] = {0};
+
+static void esp_discovery_device_identity_init(void)
+{
+	if (esp_discovery_device_identifier[0] != '\0')
+	{
+		return;
+	}
+
+	// Bounded so the compiler can prove these fit (location is up to 32 chars per the
+	// firmware's own limit; it lives in a 100 byte field)
+	snprintf(esp_discovery_device_identifier, sizeof(esp_discovery_device_identifier),
+			"roomsense_%s", roomsense_iq_shared.mac_address);
+
+	if (roomsense_iq_shared.location[0] != '\0')
+	{
+		snprintf(esp_discovery_device_name, sizeof(esp_discovery_device_name),
+				"RoomSense IQ %.32s (%.12s)", roomsense_iq_shared.location, roomsense_iq_shared.mac_address);
+	}
+	else
+	{
+		snprintf(esp_discovery_device_name, sizeof(esp_discovery_device_name),
+				"RoomSense IQ %.12s", roomsense_iq_shared.mac_address);
+	}
+}
+
 char* esp_discovery_serialize_number(esp_discovery_number_t *discovery)
 {
 	char *json = NULL;
@@ -68,11 +99,12 @@ char* esp_discovery_serialize_number(esp_discovery_number_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -137,11 +169,12 @@ char* esp_discovery_serialize_button(esp_discovery_button_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -198,11 +231,12 @@ char* esp_discovery_serialize_switch(esp_discovery_switch_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -225,11 +259,12 @@ char* esp_discovery_serialize_room_presence(esp_discovery_room_presence_t *disco
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -307,11 +342,12 @@ char* esp_discovery_serialize_pir_sensor(esp_discovery_pir_sensor_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -379,11 +415,12 @@ char* esp_discovery_serialize_macro_move_sensor(esp_discovery_macro_move_sensor_
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -436,11 +473,12 @@ char* esp_discovery_serialize_micro_move_sensor(esp_discovery_micro_move_sensor_
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -493,11 +531,12 @@ char* esp_discovery_serialize_light_sensor(esp_discovery_light_sensor_t *discove
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -573,11 +612,12 @@ char* esp_discovery_serialize_sensor(esp_discovery_sensor_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
@@ -651,11 +691,12 @@ char* esp_discovery_serialize_text(esp_discovery_text_t *discovery)
 
 	cJSON *device = cJSON_CreateObject();
 	cJSON_AddItemToObject(root, "device", device);
+	esp_discovery_device_identity_init();
 	cJSON *identifiers = cJSON_CreateStringArray((const char*[]
 			)
-			{ "RoomSense" }, 1);
+			{ esp_discovery_device_identifier }, 1);
 	cJSON_AddItemToObject(device, "identifiers", identifiers);
-	cJSON_AddStringToObject(device, "name", "RoomSense IQ");
+	cJSON_AddStringToObject(device, "name", esp_discovery_device_name);
 
 	cJSON_AddStringToObject(root, "platform", discovery->platform);
 	cJSON_AddStringToObject(root, "schema", discovery->schema);
