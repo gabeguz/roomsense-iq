@@ -1,0 +1,6 @@
+model: Hermes Agent
+model-rev: deepseek-v4.1-flash (nous, 2026-11-13)
+intent: Make gabe's fork main carry the three community fixes on top of upstream f273791, keeping each feature as its own reviewable commit
+rejected: Squashing the three features into one commit on main - destroys the per-feature reviewability that the upstream PRs (#13, #14, #15) are built around
+rejected: Fast-forwarding main onto the combined branch - that branch carries a squashed AP+device-identity commit, so the split would be lost
+verified: main tree is byte-identical to the source of the released v2026.11.13-community build (git diff vs community/softap-toggle-and-ha-device is empty); each feature commit built clean on its own with ESP-IDF v4.4.8
